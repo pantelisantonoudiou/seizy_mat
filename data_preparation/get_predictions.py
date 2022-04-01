@@ -143,7 +143,7 @@ class ModelPredict:
         for i in range(bounds_pred.shape[0]):   # assign index to 1
         
             if bounds_pred[i,0] > 0:   
-                ver_pred[bounds_pred[i,0]:bounds_pred[i,1]] = 1
+                ver_pred[bounds_pred[i,0]:bounds_pred[i,1]+1] = 1
             
         # save file
         np.savetxt(file_path, ver_pred, delimiter=',', fmt='%i')

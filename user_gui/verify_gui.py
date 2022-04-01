@@ -129,10 +129,10 @@ class VerifyGui(object):
         
         if self.idx_out[self.i,1] == -1:            # if seizure rejected
             self.start = self.idx[self.i,0]         # get start
-            self.stop = self.idx[self.i,1]+1        # get stop
+            self.stop = self.idx[self.i,1]          # get stop
         else: 
             self.start = self.idx_out[self.i,0]     # get start
-            self.stop = self.idx_out[self.i,1]+1    # get stop
+            self.stop = self.idx_out[self.i,1]      # get stop
         
         
     def plot_data(self, user_start=None, user_stop=None):
@@ -163,7 +163,7 @@ class VerifyGui(object):
             start = user_start; stop = user_stop # plot user defined
         else:                       
             start = self.start; stop = self.stop # plot model defined
-        stop+=1
+
         # plot channels
         for i in range(self.axs.shape[0]): 
             y = self.data[self.start - self.seg : self.stop + self.seg,:, i].flatten()
@@ -175,8 +175,8 @@ class VerifyGui(object):
             self.axs[i].set_title(self.ch_list[i], loc ='left')
             
             # plot highlighted region
-            yzoom = self.data[start: stop,:,i].flatten() # get y values of highlighted region
-            tzoom = np.linspace(start, stop, len(yzoom)) # get time of highlighted region
+            yzoom = self.data[start: stop+1,:,i].flatten() # get y values of highlighted region
+            tzoom = np.linspace(start, stop+1, len(yzoom)) # get time of highlighted region
             self.axs[i].plot(tzoom, yzoom, color='orange', linewidth=0.75, alpha=0.9) # plot
 
         self.fig.canvas.draw()
@@ -249,7 +249,7 @@ class VerifyGui(object):
         self.idx_out[self.i,1] = indmax
         
         # highlight user selected region
-        self.plot_data(user_start = indmin, user_stop = indmax)
+        self.plot_data(user_start=indmin, user_stop=indmax)
         
 
         
