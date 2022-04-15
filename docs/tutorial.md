@@ -29,7 +29,7 @@ python cli.py process
 
 5) **Set [parent folder](configuration.md#path-organization) for seizure verification.**
 ```
-python cli.py process
+python cli.py setmainpath
 ```
 
 6) **Verify seizures and adjust seizure boundaries.**
