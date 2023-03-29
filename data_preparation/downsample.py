@@ -92,7 +92,9 @@ class Lab2h5:
             ch_idx = np.linspace(1, f.n_channels, f.n_channels, dtype=int)
             ch_list = np.split(ch_idx, round(f.n_channels/len(self.ch_struct)))
 
-            for ii in range(len(ch_list)): # iterate through animals
+            for ii in range(len(ch_list)): # iterate through animals (skip if animal ID is empty)
+                if self.animal_ids[ii] == 'empty':
+                    continue
                 
                 # downsample and save in chuncks
                 filename = self.filelist[i].replace(self.file_ext, "") + '_' + self.animal_ids[ii]
