@@ -182,7 +182,7 @@ def preprocess(sig, down_factor, new_fs, cols):
 if __name__ == '__main__':
     
     # settings
-    load_path = input("Please enter path to .mat file:\n")#r"R:\Collaborations\Trina-Misty_Collaboration\test_seizy\EEG S7284C2 12022022.mat"
+    load_path = input("Please enter path to .mat file:\n")
     load_path = load_path.strip('"')
     if os.path.isfile(load_path):
         save_path = load_path[:-3] + 'csv'
@@ -212,8 +212,8 @@ if __name__ == '__main__':
     
         # check for zero seizures otherwise proceed with gui creation
         if idx_bounds.shape[0] == 0:
-            np.savetxt(save_path, np.zeros(y_pred), delimiter=',',fmt='%i')
-            print('No seizures detected. Verified predictions were saved to {save_path}\n')
+            np.savetxt(save_path, np.zeros(y_pred.shape[0]), delimiter=',',fmt='%i')
+            print(f'Zero seizures detected. Verified predictions were saved to {save_path}\n')
         else:
             data = clean_sig.reshape((clean_sig.shape[0], clean_sig.shape[1], 1))
             VerifyGui(data, idx_bounds, win, fs, save_path)
