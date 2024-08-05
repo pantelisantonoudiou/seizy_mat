@@ -16,38 +16,27 @@ class VerifyGui(object):
     
     ind = 0 # set internal counter
        
-    def __init__(self, settings, file_id, data, idx_bounds):
+    def __init__(self, data, idx_bounds, win, fs, save_path):
         """  
-
-        Parameters
-        ----------
-        settings : dict, with configuration settings
-        file_id : str, file name
-        data : 3D Numpy array, (1D = seizure segments, 2D =  columns (samples: window*sampling rate), 3D = channels) 
-        idx_bounds : 2D Numpy array (1D = seizure segments, 2D, 1 = start, 2 = stop index)
-
-        Returns
-        -------
-        None.
-
         """
 
         # pass object attributes to class
         self.data = data                                                        # data
-        self.file_id = file_id                                                  # file name
+        self.save_path = save_path                                              # file name
         self.idx = np.copy(idx_bounds)                                          # original index from model
         self.idx_out = np.copy(idx_bounds)                                      # output index
         self.facearray = ['w']*idx_bounds.shape[0]                              # color list
         self.bounds = 60                                                        # surrounding region in seconds
-        self.win = settings['win']                                              # window (column size) 
-        self.fs = settings['new_fs']                                            # sampling rate
-        self.ch_list = np.array(settings['ch_struct'])[settings['ch_list']]     # channel names
-        self.verpred_dir = os.path.join(settings['main_path'], settings['verpred_dir'])
-        self.wait_time = 0.1 # in seconds
+        self.win = win                                                          # window (column size) 
+        self.fs = fs                                                            # sampling rate
+        self.wait_time = 0.1                                                    # in seconds
         
         # create figure and axis
-        self.fig, self.axs = plt.subplots(data.shape[2], 1, sharex = True, figsize=(8,8))
-
+        self.fig, self.axs = plt.subplots(data.shape[2], 1, sharex=True, figsize=(10,6*data.shape[2]))
+        
+        if data.shape[2] == 1:
+            self.axs = np.array([self.axs])
+            
         # remove all axes except left 
         for i in range(self.axs.shape[0]): 
             self.axs[i].spines["top"].set_visible(False)
@@ -59,7 +48,7 @@ class VerifyGui(object):
            
         # connect callbacks and add key legend 
         plt.subplots_adjust(bottom=0.15)
-        self.fig.suptitle('To Select boundaries drag mouse : '+ self.file_id, fontsize=12)         # title  
+        self.fig.suptitle('To Select boundaries drag mouse : '+ self.save_path, fontsize=12)       # title  
         self.fig.text(0.5, 0.09,'Time Bins (' + str(self.win) + ' Sec.)', ha="center")             # xlabel
         self.fig.text(.02, .5, 'Amp. (V)', ha='center', va='center', rotation='vertical')          # ylabel
         self.fig.text(0.5, 0.04, 
@@ -113,8 +102,8 @@ class VerifyGui(object):
                 ver_pred[self.idx_out[i,0]:self.idx_out[i,1]+1] = 1
             
         # save file
-        np.savetxt(os.path.join(self.verpred_dir,self.file_id), ver_pred, delimiter=',',fmt='%i')
-        print('Verified predictions for ', self.file_id, ' were saved.\n')    
+        np.savetxt(self.save_path, ver_pred, delimiter=',',fmt='%i')
+        print('Verified predictions for ', self.save_path, ' were saved.\n')    
         
         
     def get_index(self):
@@ -165,14 +154,14 @@ class VerifyGui(object):
             start = self.start; stop = self.stop # plot model defined
 
         # plot channels
-        for i in range(self.axs.shape[0]): 
+        for i in range(self.axs.shape[0]):
             y = self.data[self.start - self.seg : self.stop + self.seg,:, i].flatten()
             t = np.linspace(self.start - self.seg, self.stop + self.seg, len(y))# get time
             self.axs[i].clear() # clear graph
             self.axs[i].plot(t, y, color='k', linewidth=0.75, alpha=0.9, label= timestr) 
             self.axs[i].set_facecolor(self.facearray[self.i]);
             self.axs[i].legend(loc = 'upper right')
-            self.axs[i].set_title(self.ch_list[i], loc ='left')
+            self.axs[i].set_title('EEG', loc ='left')
             
             # plot highlighted region
             yzoom = self.data[start: stop+1,:,i].flatten() # get y values of highlighted region
@@ -251,10 +240,3 @@ class VerifyGui(object):
         # highlight user selected region
         self.plot_data(user_start=indmin, user_stop=indmax)
         
-
-        
-        # ## ------ Mouse Button Press ------ ##   
-            
-        # def submit(self, text): # to move to a certain seizure number
-        #     self.ind = eval(text)
-        #     self.plot_data() # plot
